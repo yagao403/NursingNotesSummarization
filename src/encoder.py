@@ -61,11 +61,6 @@ def parse_args():
         default=10,
     )
     parser.add_argument(
-        "--save_steps",
-        type=int,
-        default=10,
-    )
-    parser.add_argument(
         "--model_path",
         type=str,
         required=True,
@@ -96,7 +91,7 @@ def main():
         model_inputs["labels"] = labels["input_ids"]
         return model_inputs
     tokenized_datasets = raw_datasets.map(preprocess_function, batched=True)
-    tokenized_datasets = tokenized_datasets.remove_columns(['notes'])
+    tokenized_datasets = tokenized_datasets.remove_columns(['note'])
 
     model = AutoModelForSeq2SeqLM.from_pretrained(args.model_path)
 
@@ -129,7 +124,10 @@ def main():
         args=training_args,
         data_collator=data_collator,
         train_dataset=tokenized_datasets["train"],
-        eval_dataset=tokenized_datasets["eval"],
+        eval_dataset=tokenized_datasets["validation"], 
     )
     trainer.train()
     trainer.save_model(args.output_dir) 
+
+if __name__ == "__main__":
+    main()
